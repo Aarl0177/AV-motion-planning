@@ -1,0 +1,4 @@
+<launch>
+  <!-- Adjust package name to match whatever you catkin_create_pkg'd -->
+  <node pkg="combined_nav" type="combined_nav.py" name="CombinedNav_node" output="screen"/>
+</launch>
