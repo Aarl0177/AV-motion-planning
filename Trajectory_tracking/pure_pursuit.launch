@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="pure_pursuit" type="pure_pursuit.py" name="pure_pursuit_node" output="screen">
+    <param name="waypoints_file" value="$(find pure_pursuit)/waypoints.csv"/>
+    <param name="velocity" value="1.5"/>
+  </node>
+</launch>

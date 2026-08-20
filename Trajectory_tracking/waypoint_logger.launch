@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="pure_pursuit" type="waypoint_logger.py" name="waypoint_logger" output="screen">
+    <param name="output_file" value="$(find pure_pursuit)/waypoints.csv"/>
+    <param name="min_spacing" value="0.15"/>
+  </node>
+</launch>
