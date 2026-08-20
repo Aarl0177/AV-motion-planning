@@ -7,12 +7,6 @@ three techniques into one priority-arbitrated controller:
 2. **Reactive Follow-the-Gap** — obstacle avoidance
 3. **PID Wall-Following** — default driving mode
 
-Built from F1TENTH's Lab 3 (Wall Following) and Lab 4 (Follow the Gap) as
-independent practice, then extended with a TTC-based safety layer and
-combined into a single arbitrated node rather than kept as separate
-deliverables — the interesting part of this project is the arbitration
-logic between the three, not any one algorithm in isolation.
-
 ## How it works
 
 ### 1. PID wall following
