@@ -4,16 +4,7 @@ An implementation of the Pure Pursuit path-tracking algorithm from
 F1TENTH's Lab 6, adapted to run entirely in simulation without
 Cartographer/particle-filter localization.
 
-## Why "sim-only adaptation"
 
-The official lab localizes with a particle filter running on a
-Cartographer-built SLAM map of the physical car's environment. Working
-purely in simulation, that stack isn't available, so this project
-substitutes the simulator's ground-truth `/odom` for the pose source, and
-records the reference path by letting an existing autonomous driver
-([combined_nav](../combined_nav)) complete a lap while a logger node
-captures waypoints — rather than mapping with Cartographer and manually
-driving a lap for the particle filter to localize against.
 
 ## How it works
 
@@ -77,14 +68,4 @@ logged path (blue dots) and the live lookahead target (red sphere).
 | `SIGHT_MARGIN` | safety buffer added past the target when checking LiDAR clearance |
 | `velocity` | base driving speed |
 
-## Demo
-[YouTube link here]
 
-## Credits
-Built on the lab handout for **F1TENTH Autonomous Racing, Lab 6 (Pure
-Pursuit)**, developed by the Safe Autonomous Systems Lab at the University
-of Pennsylvania (Dr. Rahul Mangharam), licensed under
-[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
-Course materials: [f1tenth.org](http://f1tenth.org/). The sim-only pose
-substitution, LiDAR-checked adaptive lookahead, and end-of-path braking
-behavior are original additions built on top of the lab's core algorithm.
