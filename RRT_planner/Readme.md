@@ -17,7 +17,7 @@ I later added A* as a second option so I could actually compare a grid-search pl
 
 ## Why it's built this way
 
-This is based on F1TENTH's Lab 7 (motion planning). The lab has you implement RRT for local obstacle avoidance, and optionally compare it against grid-based search like A* or Dijkstra's. I did both, since I wanted to see the actual difference for myself.
+In here, I implement RRT for local obstacle avoidance, and optionally compare it against grid-based search like A* or Dijkstra's. I did both, since I wanted to see the actual difference for myself.
 
 I'm running everything in simulation, not on a real car, so a few things are simplified from how the lab originally describes them:
 
