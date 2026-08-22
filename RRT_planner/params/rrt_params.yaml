@@ -1,0 +1,11 @@
+grid_width: 6.0            # meters, lateral extent (both sides combined)
+grid_height: 6.0           # meters, forward extent
+grid_resolution: 0.1       # meters per cell
+inflate_radius: 0.25       # meters, obstacle inflation (car half-width + margin)
+max_iter: 300               # RRT iterations per planning cycle
+step_size: 0.5              # meters, RRT steer step
+goal_bias: 0.15             # probability of sampling the goal directly
+goal_threshold: 0.4         # meters, distance to call "reached goal"
+goal_lookahead: 3.0         # meters, how far ahead along the global path to aim
+velocity: 1.2                # m/s
+waypoints_file: ""          # set via launch file, e.g. $(find pure_pursuit)/waypoints.csv

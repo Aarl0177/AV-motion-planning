@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="rrt_planner" type="rrt_node.py" name="rrt_node" output="screen">
+    <rosparam file="$(find rrt_planner)/params/rrt_params.yaml" command="load"/>
+    <param name="waypoints_file" value="$(find pure_pursuit)/waypoints.csv"/>
+  </node>
+</launch>
