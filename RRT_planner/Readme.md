@@ -1,63 +1,63 @@
-# F1TENTH RRT Planner
+# F1TENTH Local Motion Planner (RRT)
 
-This is a project I built to practice local motion planning for a simulated race car (the F1TENTH platform). The car uses RRT (Rapidly-exploring Random Tree) to dodge obstacles in real time using its LiDAR.
+This is a local motion planner for a simulated F1TENTH race car. It watches
+the LiDAR, notices when something's in the way, and figures out a path
+around it in real time.
 
-## What it actually does
+It works alongside a [pure pursuit](../pure_pursuit) node that follows a
+recorded lap around the track. That gives the car something to aim for.
+This planner's job is just to make sure it doesn't drive into a wall on
+the way there.
+
+## What's actually going on here
 
 Every time a new LiDAR scan comes in, the car:
 
-1. Builds a small grid map of whatever's around it right now
-2. Grows a random tree out from where it's sitting, trying to reach a point further down the track
-3. Takes whichever branch of that tree actually got close enough to the goal
-4. Steers toward the first step along that path
+1. Builds a little grid map of what's around it right now (not a
+   permanent map, just "here's what I can see this instant")
+2. Picks a goal point a few meters ahead, based on wherever the recorded
+   path is heading
+3. Tries to find a path from where it is to that goal without hitting
+   anything
+4. Steers toward the first step of whatever path it found
 
-If it can't find a path in time, it just brakes instead of guessing and driving into something.
+That's it. It does this over and over, dozens of times a second, so it's
+constantly re-planning as the world changes around it.
 
-I later added A* as a second option so I could actually compare a grid-search planner against the random-sampling one, instead of just reading about the difference. You can switch between the two with one launch argument, no code changes needed.
+### How it finds a path
 
-## Why it's built this way
-
-In here, I implement RRT for local obstacle avoidance, and optionally compare it against grid-based search like A* or Dijkstra's. I did both, since I wanted to see the actual difference for myself.
-
-I'm running everything in simulation, not on a real car, so a few things are simplified from how the lab originally describes them:
-
-- No Cartographer or particle filter — I just use the simulator's ground-truth position directly
-- The "global path" it plans toward comes from a lap I drove earlier with a different node I built (wall-following), recorded with a simple waypoint logger
+RRT basically throws darts. It picks random points nearby, checks if it
+can reach them without hitting a wall, and keeps building a tree of
+connected points until one of them is close enough to the goal. It's
+messy-looking but it works, and it doesn't need much math.
 
 ## Running it
 
-```bash
+You need the simulator running first, obviously:
+
+```
 roslaunch f1tenth_simulator simulator.launch
+```
+
+Then run it:
+
+```
 roslaunch rrt_planner rrt.launch
 ```
 
-For A* instead of RRT:
+Open RViz and add a MarkerArray on `/rrt/markers` if you want to actually
+see it thinking -- grey lines are everywhere it explored, green is the
+path it picked.
 
-```bash
-roslaunch rrt_planner rrt.launch planner_type:=astar
-```
+## Things I'd still change if I kept going
 
-Add a MarkerArray display in RViz on `/rrt/markers` to actually watch it work — grey lines are the tree it explored that cycle, green is the path it picked.
+- It's all Python, and it shows -- re-planning from scratch every single
+  scan is not free, and it's nowhere near the ~30Hz the lab's own C++
+  version manages. Fine for messing around in sim, not fine for a real
+  race.
+- No RRT* -- this is the plain version, so it doesn't try to improve a
+  path after finding one.
+- The goal point it aims for is always the same fixed distance ahead,
+  even if that spot happens to be surrounded by obstacles. A smarter
+  version would pull the goal in closer when things get crowded.
 
-## What's in here
-
-- `occupancy_grid.py` — turns raw LiDAR ranges into a small local grid map
-- `rrt.py` — the RRT algorithm itself
-- `astar.py` — the A* alternative, built to share the same grid and node structure as RRT so the visualization code didn't need to change
-- `rrt_node.py` — the actual ROS node, wires everything to the sensors and the drive commands
-
-## Things worth tuning
-
-- `max_iter` / `step_size` — how many times RRT tries per cycle, and how far each step goes. Biggest knob for speed vs. how good the path is.
-- `inflate_radius` — how much safety margin obstacles get. Too small and it clips corners, too big and it can't find a path through tight gaps.
-- `goal_lookahead` — how far down the recorded path it aims for.
-
-## Honest limitations
-
-- It's Python, so it's slower than the C++ version the lab expects for real racing speed. Fine for learning, not something I'd race with.
-- This is plain RRT, not RRT* — it just finds a path that works, it doesn't try to optimize it.
-- The goal point is always a fixed distance ahead, no matter how blocked the space around it currently is. A smarter version would shrink that distance when things get crowded.
-
-## Credit
-
-Built on F1TENTH course materials from the Safe Autonomous Systems Lab at the University of Pennsylvania (f1tenth.org), licensed under CC BY-NC-SA 4.0. The RRT algorithm follows the structure from LaValle & Kuffner's original paper, which the lab points you to.
