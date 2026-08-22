@@ -1,4 +1,4 @@
-# F1TENTH Pure Pursuit — Trajectory Tracking (sim-only adaptation)
+# F1TENTH, Trajectory Tracking 
 
 An implementation of the Pure Pursuit path-tracking algorithm from
 F1TENTH's Lab 6, adapted to run entirely in simulation without
