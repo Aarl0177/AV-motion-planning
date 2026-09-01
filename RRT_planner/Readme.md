@@ -51,10 +51,7 @@ path it picked.
 
 ## Things I'd still change if I kept going
 
-- It's all Python, and it shows -- re-planning from scratch every single
-  scan is not free, and it's nowhere near the ~30Hz the lab's own C++
-  version manages. Fine for messing around in sim, not fine for a real
-  race.
+
 - No RRT* -- this is the plain version, so it doesn't try to improve a
   path after finding one.
 - The goal point it aims for is always the same fixed distance ahead,
