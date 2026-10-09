@@ -1,1 +1,1 @@
-# Autonomous Vehicle motion planning and obstacle avoidance
+# Autonomous Vehicle Motion Planning and Safe Navigation
