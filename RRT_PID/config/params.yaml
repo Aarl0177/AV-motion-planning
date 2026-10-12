@@ -1,0 +1,84 @@
+# ---------------------------------------------------------------------------
+# Scenario + parameters. Values mirror the NMPC script wherever it had one.
+# The make_world tool reads the same file to generate the Gazebo world, so
+# the obstacles below are defined in exactly one place.
+# ---------------------------------------------------------------------------
+
+/**:
+  ros__parameters:
+    use_sim_time: true
+
+    # Vehicle (kinematic bicycle) -- same as the NMPC script
+    wheelbase: 1.0                  # L
+    steer_max: 0.3141592653589793   # pi/10
+    a_min: -2.0
+    a_max: 2.0
+    steer_rate_max: 1.5             # [rad/s] steering actuator limit (NMPC had none; 0 disables)
+
+    # Safety -- same as the NMPC script (safe radius = 0.9 m)
+    obs_radius: 0.30
+    vehicle_radius: 0.20
+    margin: 0.40
+
+    # Task: drive along the reference lane y = 2 to the goal
+    start_pose: [0.0, 0.0, 0.0]     # x, y, yaw (used by make_world for the world)
+    lane_y: 2.0
+    goal: [25.0, 2.0]
+    goal_tolerance: 0.5
+    cruise_speed: 1.5               # [m/s] (NMPC used v_ref = 1.0)
+
+    # Obstacles: flattened [x, y, vx, vy] per obstacle -- the obs_states array of
+    # the NMPC script. After changing anything in this block (obstacles, lane,
+    # goal, start_pose) regenerate the world with make_world (see README).
+    obstacles: [ 3.0, 1.50,  0.30, 0.05,
+                10.0, 2.65, -0.25, 0.04,
+                20.0, 1.65, -0.50, 0.00]
+
+    # CSV logs for the plot_results tool ("" to disable)
+    log_prefix: "/tmp/av_rrt_pid_run"
+
+obstacle_manager:
+  ros__parameters:
+    wait_for_path: true             # obstacles start moving when the first path appears
+
+rrt_planner:
+  ros__parameters:
+    plan_period: 0.2                # [s] sim time
+    goal_lookahead: 8.0             # [m] local goal on the lane (like the NMPC horizon)
+    replan_remaining: 3.0           # [m] extend the plan when this little is left
+    max_deviation: 1.0              # [m] replan if the car is this far off the path
+    plan_inflation: 0.30            # [m] extra clearance while planning
+    rrt:
+      step_size: 0.6
+      goal_bias: 0.15
+      connect_radius: 3.0
+      max_iterations: 3000
+      plan_accel: 1.0               # [m/s^2] assumed acceleration for path timing
+      prediction_horizon: 6.0       # [s] (NMPC: N * dt = 6 s)
+      check_resolution: 0.1
+      smoothing_iterations: 2
+      bounds: [-5.0, 40.0, -1.5, 5.5]   # x_min, x_max, y_min, y_max
+      seed: 0                       # 0 = random
+
+pid_controller:
+  ros__parameters:
+    control_period: 0.1             # [s] sim time, same dt as the NMPC script
+    v_max: 3.0
+    lookahead_min: 0.8              # [m]   Ld = lookahead_min + lookahead_gain * v
+    lookahead_gain: 0.3             # [s]
+    min_speed_factor: 0.4
+    goal_slowdown_dist: 4.0
+    # Both loops act on integrators (v' = a, psi' = v tan(delta)/L), so P + I
+    # does the work. The D-term is derivative-on-measurement (no kick when a
+    # new path arrives); on the heading loop it feeds back the previous
+    # steering command and causes chatter, so it starts at 0.
+    speed_pid:                      # e_v = v_target - v        -> a
+      kp: 1.5
+      ki: 0.3
+      kd: 0.0
+      i_limit: 1.0
+    heading_pid:                    # e_psi = bearing - psi     -> delta
+      kp: 2.0
+      ki: 0.05
+      kd: 0.0
+      i_limit: 0.3
